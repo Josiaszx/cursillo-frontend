@@ -1,0 +1,65 @@
+<app-dialog [titulo]="grupo() ? 'Editar grupo' : 'Nuevo grupo'" (cerrar)="cancelar.emit()">
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    @if (error(); as texto) {
+      <div class="alert alert-error" role="alert">
+        <span>{{ texto }}</span>
+        @if (existenteInhabilitado() !== null) {
+          <button type="button" class="btn-sec btn-sm" [disabled]="enviando()" (click)="reactivar()">
+            Reactivar grupo
+          </button>
+        }
+      </div>
+    }
+
+    <div class="campo">
+      <label class="field-label" for="grupo-nombre">Nombre</label>
+      <input
+        id="grupo-nombre"
+        class="field"
+        type="text"
+        formControlName="nombre"
+        autofocus
+        autocomplete="off"
+        [attr.aria-invalid]="mensaje('nombre') ? 'true' : null"
+      />
+      @if (mensaje('nombre'); as m) {
+        <p class="field-error">{{ m }}</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label class="field-label" for="grupo-anio">Año de convocatoria (opcional)</label>
+      <input
+        id="grupo-anio"
+        class="field"
+        type="number"
+        formControlName="anioConvocatoria"
+        [attr.aria-invalid]="mensaje('anioConvocatoria') ? 'true' : null"
+      />
+      @if (mensaje('anioConvocatoria'); as m) {
+        <p class="field-error">{{ m }}</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label class="field-label" for="grupo-numero">Número de convocatoria (opcional)</label>
+      <input
+        id="grupo-numero"
+        class="field"
+        type="number"
+        formControlName="numeroConvocatoria"
+        [attr.aria-invalid]="mensaje('numeroConvocatoria') ? 'true' : null"
+      />
+      @if (mensaje('numeroConvocatoria'); as m) {
+        <p class="field-error">{{ m }}</p>
+      }
+    </div>
+
+    <div class="form-acciones">
+      <button type="button" class="btn-sec" (click)="cancelar.emit()">Cancelar</button>
+      <button type="submit" class="btn" [disabled]="enviando()">
+        {{ enviando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-dialog>

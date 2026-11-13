@@ -1,0 +1,221 @@
+$gap: 16px;
+$side-ancho: 264px;
+$side-ancho-colapsado: 88px;
+
+@mixin solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.shell {
+  --side-w: #{$side-ancho};
+  min-height: 100dvh;
+}
+
+.shell.is-collapsed {
+  --side-w: #{$side-ancho-colapsado};
+}
+
+/* Sidebar fijo: ocupa todo el alto de la ventana y no se mueve al hacer scroll. */
+.side {
+  position: fixed;
+  inset: $gap auto $gap $gap;
+  width: var(--side-w);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 16px;
+  background: var(--color-sidebar);
+  border-radius: var(--radio-xl);
+  transition: width 0.2s ease;
+}
+
+/* Deja sitio a la izquierda para que el botón, que sale del sidebar al colapsar,
+   no pise el contenido. */
+.main {
+  min-width: 0;
+  margin-left: calc(var(--side-w) + #{$gap * 2});
+  padding: 28px 32px 32px 36px;
+  transition: margin-left 0.2s ease;
+}
+
+.brandrow {
+  display: flex;
+  align-items: center;
+  padding: 4px 0 4px 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radio-md);
+  background: var(--color-sidebar-activo);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.brand-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* El botón vive siempre posicionado sobre el sidebar: expandido queda en su sitio
+   original (arriba a la derecha, dentro); colapsado sale a un recuadro por fuera. */
+.tog {
+  position: absolute;
+  top: 26px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--color-sidebar-activo);
+  border-radius: var(--radio-sm);
+  /* Mismos colores que el sidebar en ambos estados; con fondo sólido para que
+     el recuadro se vea al salir sobre el fondo claro. */
+  background: var(--color-sidebar);
+  color: var(--color-sidebar-texto);
+  cursor: pointer;
+  transition: right 0.2s ease;
+
+  &:hover {
+    background: var(--color-sidebar-hover);
+    color: #fff;
+  }
+
+  app-icon {
+    transition: transform 0.2s ease;
+  }
+}
+
+/* La lista de navegación hace scroll por dentro si la ventana es muy baja. */
+.navlist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* 18px + 20px de icono: centro a 28px dentro de los 56px útiles del sidebar
+     colapsado, alineado con el logo. El padding es igual en ambos estados, así
+     el icono no se mueve al colapsar. */
+  padding: 11px 18px;
+  white-space: nowrap;
+  border-radius: var(--radio-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-sidebar-texto);
+
+  &:hover {
+    background: var(--color-sidebar-hover);
+    color: #fff;
+  }
+
+  &.active {
+    background: var(--color-sidebar-activo);
+    color: #fff;
+  }
+}
+
+.shell.is-collapsed {
+  .lbl {
+    @include solo-lectores;
+  }
+
+  .tog {
+    right: -44px;
+
+    app-icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+/* Móvil: el sidebar pasa a ser una barra superior fija con solo iconos. */
+@media (max-width: 640px) {
+  .side {
+    inset: 0 0 auto 0;
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 0 0 var(--radio-lg) var(--radio-lg);
+  }
+
+  .brandrow {
+    padding: 0;
+  }
+
+  .tog {
+    display: none;
+  }
+
+  .lbl {
+    @include solo-lectores;
+  }
+
+  .navlist {
+    flex-direction: row;
+    flex: 1;
+    justify-content: flex-end;
+    overflow: visible;
+  }
+
+  .nav {
+    padding: 10px 12px;
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 84px 16px 24px;
+  }
+}
+
+/* Enlace de salto: invisible hasta recibir el foco con el teclado. */
+.saltar {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  padding: 10px 16px;
+  border-radius: var(--radio-md);
+  background: var(--color-primario);
+  color: #fff;
+  font-weight: 600;
+  transform: translateY(-200%);
+
+  &:focus {
+    transform: none;
+  }
+}
+
+.main:focus {
+  outline: none;
+}

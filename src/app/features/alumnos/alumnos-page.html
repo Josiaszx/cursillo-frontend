@@ -1,0 +1,135 @@
+<header class="page-head">
+  <div>
+    <h1 class="page-title">Alumnos</h1>
+    <p class="page-sub">
+      @if (alumnos.hasValue()) {
+        {{ alumnos.value().total }} {{ alumnos.value().total === 1 ? 'alumno' : 'alumnos' }}
+      } @else {
+        Inscritos en los grupos del cursillo
+      }
+    </p>
+  </div>
+  <button class="btn" type="button" (click)="nuevo()">
+    <app-icon nombre="mas" [tamano]="18" />
+    Nuevo alumno
+  </button>
+</header>
+
+@if (error(); as texto) {
+  <div class="alert alert-error" role="alert">
+    <span>{{ texto }}</span>
+    <button type="button" class="alert-cerrar" (click)="error.set(null)">Cerrar</button>
+  </div>
+}
+
+<div class="toolbar">
+  <label class="busqueda">
+    <span class="sr-only">Buscar alumno</span>
+    <app-icon nombre="buscar" [tamano]="18" />
+    <input
+      class="field"
+      name="buscar"
+      type="search"
+      placeholder="Buscar por CI, nombre o apellido"
+      (input)="alEscribirBusqueda($any($event.target).value)"
+    />
+  </label>
+  <label>
+    <span class="sr-only">Filtrar por grupo</span>
+    <select class="field filtro-grupo" name="grupo" (change)="cambiarGrupo($any($event.target).value)">
+      <option value="">Todos los grupos</option>
+      @for (g of grupos.value() ?? []; track g.id) {
+        <option [value]="g.id">{{ g.nombre }}{{ g.habilitado ? '' : ' (inhabilitado)' }}</option>
+      }
+    </select>
+  </label>
+  <app-selector-estado [valor]="estado()" (valorChange)="cambiarEstado($event)" />
+</div>
+
+@if (alumnos.error()) {
+  <div class="alert alert-error" role="alert">
+    <span>{{ mensajeCarga() }}</span>
+    <button type="button" class="btn-sec btn-sm" (click)="alumnos.reload()">Reintentar</button>
+  </div>
+} @else if (!alumnos.hasValue()) {
+  <p class="estado-vacio" role="status">Cargando alumnos…</p>
+} @else {
+  <section class="card" style="overflow: hidden" aria-label="Lista de alumnos">
+    @if (alumnos.value().items.length === 0) {
+      <p class="estado-vacio">
+        {{ hayFiltros() ? 'No hay alumnos que coincidan con la búsqueda.' : 'No hay alumnos para este filtro.' }}
+      </p>
+    } @else {
+      <div class="tabla-wrap">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th scope="col">Alumno</th>
+              <th scope="col">Grupo</th>
+              <th scope="col">Teléfono</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of alumnos.value().items; track a.ci) {
+              <tr [class.off]="!a.habilitado">
+                <td>
+                  {{ nombreCompleto(a) }}
+                  <span class="celda-sec">CI {{ a.ci }}{{ a.correo ? ' · ' + a.correo : '' }}</span>
+                </td>
+                <td>
+                  {{ a.grupo.nombre }}
+                  @if (!a.grupo.habilitado) {
+                    <span class="celda-sec">Grupo inhabilitado</span>
+                  }
+                </td>
+                <td>{{ a.telefono ?? '—' }}</td>
+                <td>
+                  <span class="badge" [class.badge-ok]="a.habilitado" [class.badge-off]="!a.habilitado">
+                    {{ a.habilitado ? 'Habilitado' : 'Inhabilitado' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="acciones">
+                    <button type="button" class="btn-sec btn-sm" (click)="editar(a)">Editar</button>
+                    @if (a.habilitado) {
+                      <button
+                        type="button"
+                        class="btn-sec btn-sm"
+                        [disabled]="procesando() === a.ci"
+                        (click)="inhabilitar(a)"
+                      >
+                        Inhabilitar
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn-sec btn-sm"
+                        [disabled]="procesando() === a.ci"
+                        (click)="habilitar(a)"
+                      >
+                        Habilitar
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <app-paginador
+        [page]="alumnos.value().page"
+        [size]="alumnos.value().size"
+        [total]="alumnos.value().total"
+        (pageChange)="page.set($event)"
+        (sizeChange)="cambiarTamano($event)"
+      />
+    }
+  </section>
+}
+
+@if (formAbierto()) {
+  <app-alumno-form [alumno]="alumnoEditando()" (guardado)="alGuardar($event)" (cancelar)="formAbierto.set(false)" />
+}

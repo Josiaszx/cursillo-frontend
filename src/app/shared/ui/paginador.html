@@ -1,0 +1,49 @@
+<div class="pie" [class.sin-borde]="!borde()">
+  <span class="info">Mostrando {{ desde() }}–{{ hasta() }} de {{ total() }}</span>
+
+  <nav class="paginas" aria-label="Paginación">
+    <button
+      type="button"
+      class="pag"
+      [disabled]="page() <= 1"
+      aria-label="Página anterior"
+      (click)="pageChange.emit(page() - 1)"
+    >
+      ‹
+    </button>
+    @for (p of paginas(); track $index) {
+      @if (p === null) {
+        <span class="salto" aria-hidden="true">…</span>
+      } @else {
+        <button
+          type="button"
+          class="pag"
+          [class.on]="p === page()"
+          [attr.aria-current]="p === page() ? 'page' : null"
+          [attr.aria-label]="'Página ' + p"
+          (click)="pageChange.emit(p)"
+        >
+          {{ p }}
+        </button>
+      }
+    }
+    <button
+      type="button"
+      class="pag"
+      [disabled]="page() >= totalPages()"
+      aria-label="Página siguiente"
+      (click)="pageChange.emit(page() + 1)"
+    >
+      ›
+    </button>
+  </nav>
+
+  <label class="tam">
+    Por página
+    <select class="sel" name="tamano" (change)="alCambiarTamano($event)">
+      @for (t of tamanos(); track t) {
+        <option [value]="t" [selected]="t === size()">{{ t }}</option>
+      }
+    </select>
+  </label>
+</div>

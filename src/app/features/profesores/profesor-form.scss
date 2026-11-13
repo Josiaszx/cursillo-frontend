@@ -1,0 +1,26 @@
+.fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.ayuda {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--color-texto-suave);
+}
+
+.field:disabled {
+  background: var(--color-superficie-alt);
+  color: var(--color-texto-suave);
+}
+
+.reactivar {
+  margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .fila {
+    grid-template-columns: 1fr;
+  }
+}

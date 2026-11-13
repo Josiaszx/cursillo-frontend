@@ -1,0 +1,68 @@
+.pc {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+
+  &.off {
+    background: var(--color-superficie-alt);
+  }
+}
+
+.ptop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primario);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pnombre {
+  flex: 1;
+  min-width: 0;
+}
+
+.pname {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.correo {
+  overflow-wrap: anywhere;
+}
+
+.pfoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-borde-suave);
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.pie-lista {
+  margin-top: 16px;
+
+  app-paginador {
+    display: block;
+  }
+}

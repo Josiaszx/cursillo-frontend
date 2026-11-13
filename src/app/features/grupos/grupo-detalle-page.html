@@ -1,0 +1,152 @@
+<a class="lnk volver" routerLink="/grupos">← Grupos</a>
+
+@if (grupo.error()) {
+  <div class="alert alert-error" role="alert">
+    <span>{{ mensaje(grupo.error()) }}</span>
+  </div>
+} @else if (grupo.hasValue()) {
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">
+        {{ grupo.value().nombre }}
+        @if (!grupo.value().habilitado) {
+          <span class="badge badge-off">Inhabilitado</span>
+        }
+      </h1>
+      <p class="page-sub">
+        @if (convocatoria()) {
+          {{ convocatoria() }} ·
+        }
+        {{ grupo.value().cantidadAlumnos }} alumnos habilitados
+      </p>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="pestanas" role="tablist" aria-label="Secciones del grupo">
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.on]="pestana() === 'alumnos'"
+        [attr.aria-selected]="pestana() === 'alumnos'"
+        (click)="cambiarPestana('alumnos')"
+      >
+        Alumnos
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.on]="pestana() === 'clases'"
+        [attr.aria-selected]="pestana() === 'clases'"
+        (click)="cambiarPestana('clases')"
+      >
+        Clases
+      </button>
+    </div>
+  </div>
+
+  <section class="card" style="overflow: hidden" role="tabpanel">
+    @if (pestana() === 'alumnos') {
+      @if (alumnos.error()) {
+        <p class="estado-vacio" role="alert">{{ mensaje(alumnos.error()) }}</p>
+      } @else if (alumnos.isLoading() || !alumnos.hasValue()) {
+        <p class="estado-vacio" role="status">Cargando alumnos…</p>
+      } @else if (alumnos.value().length === 0) {
+        <p class="estado-vacio">Este grupo no tiene alumnos.</p>
+      } @else {
+        <div class="tabla-wrap">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th scope="col">Alumno</th>
+                <th scope="col">CI</th>
+                <th scope="col">Teléfono</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of paginacionAlumnos.visibles(); track a.ci) {
+                <tr [class.off]="!a.habilitado">
+                  <td>{{ nombreCompleto(a) }}</td>
+                  <td>{{ a.ci }}</td>
+                  <td>{{ a.telefono ?? '—' }}</td>
+                  <td>
+                    <span class="badge" [class.badge-ok]="a.habilitado" [class.badge-off]="!a.habilitado">
+                      {{ a.habilitado ? 'Habilitado' : 'Inhabilitado' }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <app-paginador
+          [page]="paginacionAlumnos.paginaActual()"
+          [size]="paginacionAlumnos.size()"
+          [total]="paginacionAlumnos.total()"
+          (pageChange)="paginacionAlumnos.irA($event)"
+          (sizeChange)="paginacionAlumnos.cambiarTamano($event)"
+        />
+      }
+    } @else {
+      @if (clases.error()) {
+        <p class="estado-vacio" role="alert">{{ mensaje(clases.error()) }}</p>
+      } @else if (clases.isLoading() || !clases.hasValue()) {
+        <p class="estado-vacio" role="status">Cargando clases…</p>
+      } @else if (clases.value().items.length === 0) {
+        <p class="estado-vacio">Este grupo no tiene clases.</p>
+      } @else {
+        <div class="tabla-wrap">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Horario</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Aula</th>
+                <th scope="col">Profesor</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of clases.value().items; track c.id) {
+                <tr [class.off]="!c.habilitado">
+                  <td>{{ c.fecha ? (c.fecha | date: 'dd/MM/yyyy') : '—' }}</td>
+                  <td>{{ hora(c.horaInicio) }} – {{ hora(c.horaFin) }}</td>
+                  <td>{{ c.tipoClase?.nombre ?? '—' }}</td>
+                  <td>{{ c.aula?.nombre ?? '—' }}</td>
+                  <td>
+                    @if (c.profesor; as p) {
+                      {{ nombreCompleto(p) }}
+                      @if (!p.habilitado) {
+                        <span class="celda-sec">Profesor inhabilitado</span>
+                      }
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td>
+                    <span class="badge" [class.badge-ok]="c.habilitado" [class.badge-off]="!c.habilitado">
+                      {{ c.habilitado ? 'Habilitada' : 'Inhabilitada' }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <app-paginador
+          [page]="clases.value().page"
+          [size]="clases.value().size"
+          [total]="clases.value().total"
+          (pageChange)="page.set($event)"
+          (sizeChange)="cambiarTamanoClases($event)"
+        />
+      }
+    }
+  </section>
+} @else {
+  <p class="estado-vacio" role="status">Cargando grupo…</p>
+}

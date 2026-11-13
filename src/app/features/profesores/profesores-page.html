@@ -1,0 +1,105 @@
+<header class="page-head">
+  <div>
+    <h1 class="page-title">Profesores</h1>
+    <p class="page-sub">
+      @if (profesores.hasValue()) {
+        {{ profesores.value().length }} {{ profesores.value().length === 1 ? 'profesor' : 'profesores' }}
+      } @else {
+        Docentes del cursillo
+      }
+    </p>
+  </div>
+  <button class="btn" type="button" (click)="nuevo()">
+    <app-icon nombre="mas" [tamano]="18" />
+    Nuevo profesor
+  </button>
+</header>
+
+@if (error(); as texto) {
+  <div class="alert alert-error" role="alert">
+    <span>{{ texto }}</span>
+    <button type="button" class="alert-cerrar" (click)="error.set(null)">Cerrar</button>
+  </div>
+}
+
+<div class="toolbar">
+  <app-selector-estado [(valor)]="estado" />
+</div>
+
+@if (profesores.error()) {
+  <div class="alert alert-error" role="alert">
+    <span>{{ mensajeCarga() }}</span>
+    <button type="button" class="btn-sec btn-sm" (click)="profesores.reload()">Reintentar</button>
+  </div>
+} @else if (profesores.isLoading() && !profesores.hasValue()) {
+  <p class="estado-vacio" role="status">Cargando profesores…</p>
+} @else if (profesores.hasValue()) {
+  @if (profesores.value().length === 0) {
+    <p class="estado-vacio card">No hay profesores para este filtro.</p>
+  } @else {
+    <section class="grid-cards" aria-label="Lista de profesores">
+      @for (p of paginacion.visibles(); track p.ci) {
+        <article class="card pc" [class.off]="!p.habilitado">
+          <div class="ptop">
+            <div class="avatar" aria-hidden="true">{{ iniciales(p) }}</div>
+            <div class="pnombre">
+              <h2 class="pname">{{ nombreCompleto(p) }}</h2>
+              <span class="celda-sec">CI {{ p.ci }}</span>
+            </div>
+            @if (!p.habilitado) {
+              <span class="badge badge-off">Inhabilitado</span>
+            }
+          </div>
+          <dl class="dl">
+            <div class="dr"><dt>Edad</dt><dd>{{ p.edad ?? '—' }}</dd></div>
+            <div class="dr"><dt>Teléfono</dt><dd>{{ p.telefono ?? '—' }}</dd></div>
+            <div class="dr"><dt>Correo</dt><dd class="correo">{{ p.correo ?? '—' }}</dd></div>
+          </dl>
+          <div class="pfoot">
+            <a class="lnk" [routerLink]="['/profesores', p.ci]">Ver clases</a>
+            <div class="acciones">
+              <button type="button" class="btn-sec btn-sm" (click)="editar(p)">Editar</button>
+              @if (p.habilitado) {
+                <button
+                  type="button"
+                  class="btn-sec btn-sm"
+                  [disabled]="procesando() === p.ci"
+                  (click)="inhabilitar(p)"
+                >
+                  Inhabilitar
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn-sec btn-sm"
+                  [disabled]="procesando() === p.ci"
+                  (click)="habilitar(p)"
+                >
+                  Habilitar
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+    <div class="card pie-lista">
+      <app-paginador
+        [page]="paginacion.paginaActual()"
+        [size]="paginacion.size()"
+        [total]="paginacion.total()"
+        [borde]="false"
+        (pageChange)="paginacion.irA($event)"
+        (sizeChange)="paginacion.cambiarTamano($event)"
+      />
+    </div>
+  }
+}
+
+@if (formAbierto()) {
+  <app-profesor-form
+    [profesor]="profesorEditando()"
+    (guardado)="alGuardar($event)"
+    (cancelar)="formAbierto.set(false)"
+  />
+}

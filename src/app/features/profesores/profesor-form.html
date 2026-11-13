@@ -1,0 +1,124 @@
+<app-dialog [titulo]="profesor() ? 'Editar profesor' : 'Nuevo profesor'" (cerrar)="cancelar.emit()">
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    @if (error(); as texto) {
+      <div class="alert alert-error" role="alert">
+        <span>{{ texto }}</span>
+        @if (existenteInhabilitado() !== null) {
+          <button type="button" class="btn-sec btn-sm" [disabled]="enviando()" (click)="reactivar()">
+            Reactivar profesor
+          </button>
+        }
+      </div>
+    }
+
+    <div class="campo">
+      <label class="field-label" for="profesor-ci">CI</label>
+      <input
+        id="profesor-ci"
+        class="field"
+        type="number"
+        formControlName="ci"
+        [attr.autofocus]="profesor() ? null : ''"
+        (blur)="verificarCi()"
+        [attr.aria-invalid]="mensaje('ci') ? 'true' : null"
+      />
+      @if (verificandoCi()) {
+        <p class="ayuda" role="status">Comprobando CI…</p>
+      }
+      @if (profesor()) {
+        <p class="ayuda">El CI no se puede cambiar.</p>
+      }
+      @if (mensaje('ci'); as m) {
+        <p class="field-error">{{ m }}</p>
+        @if (existenteInhabilitado() !== null) {
+          <button type="button" class="btn-sec btn-sm reactivar" [disabled]="enviando()" (click)="reactivar()">
+            Reactivar profesor
+          </button>
+        }
+      }
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label class="field-label" for="profesor-nombres">Nombres</label>
+        <input
+          id="profesor-nombres"
+          class="field"
+          type="text"
+          formControlName="nombres"
+          [attr.autofocus]="profesor() ? '' : null"
+          autocomplete="off"
+          [attr.aria-invalid]="mensaje('nombres') ? 'true' : null"
+        />
+        @if (mensaje('nombres'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+      <div class="campo">
+        <label class="field-label" for="profesor-apellidos">Apellidos</label>
+        <input
+          id="profesor-apellidos"
+          class="field"
+          type="text"
+          formControlName="apellidos"
+          autocomplete="off"
+          [attr.aria-invalid]="mensaje('apellidos') ? 'true' : null"
+        />
+        @if (mensaje('apellidos'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label class="field-label" for="profesor-edad">Edad (opcional)</label>
+        <input
+          id="profesor-edad"
+          class="field"
+          type="number"
+          formControlName="edad"
+          [attr.aria-invalid]="mensaje('edad') ? 'true' : null"
+        />
+        @if (mensaje('edad'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+      <div class="campo">
+        <label class="field-label" for="profesor-telefono">Teléfono (opcional)</label>
+        <input
+          id="profesor-telefono"
+          class="field"
+          type="tel"
+          formControlName="telefono"
+          [attr.aria-invalid]="mensaje('telefono') ? 'true' : null"
+        />
+        @if (mensaje('telefono'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="campo">
+      <label class="field-label" for="profesor-correo">Correo (opcional)</label>
+      <input
+        id="profesor-correo"
+        class="field"
+        type="email"
+        formControlName="correo"
+        autocomplete="off"
+        [attr.aria-invalid]="mensaje('correo') ? 'true' : null"
+      />
+      @if (mensaje('correo'); as m) {
+        <p class="field-error">{{ m }}</p>
+      }
+    </div>
+
+    <div class="form-acciones">
+      <button type="button" class="btn-sec" (click)="cancelar.emit()">Cancelar</button>
+      <button type="submit" class="btn" [disabled]="enviando()">
+        {{ enviando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-dialog>

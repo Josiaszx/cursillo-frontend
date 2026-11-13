@@ -1,0 +1,44 @@
+<a class="saltar" href="#contenido" (click)="irAlContenido($event)">Saltar al contenido</a>
+
+<div class="shell" [class.is-collapsed]="colapsado()">
+  <aside class="side">
+    <div class="brandrow">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">C</div>
+        <span class="lbl brand-name">Cursillo</span>
+      </div>
+    </div>
+
+    <button
+      class="tog"
+      type="button"
+      (click)="alternar()"
+      [attr.aria-expanded]="!colapsado()"
+      [attr.aria-label]="colapsado() ? 'Expandir menú' : 'Contraer menú'"
+      [attr.title]="colapsado() ? 'Expandir menú' : 'Contraer menú'"
+    >
+      <app-icon nombre="chevrons-izquierda" [tamano]="18" />
+    </button>
+
+    <nav class="navlist" aria-label="Navegación principal">
+      @for (item of items; track item.ruta) {
+        <a
+          class="nav"
+          [routerLink]="item.ruta"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          [attr.title]="item.etiqueta"
+        >
+          <app-icon [nombre]="item.icono" />
+          <span class="lbl">{{ item.etiqueta }}</span>
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <main class="main" id="contenido" tabindex="-1">
+    <router-outlet />
+  </main>
+</div>
+
+<app-notificaciones />

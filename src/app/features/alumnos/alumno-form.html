@@ -1,0 +1,147 @@
+<app-dialog [titulo]="alumno() ? 'Editar alumno' : 'Nuevo alumno'" (cerrar)="cancelar.emit()">
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    @if (error(); as texto) {
+      <div class="alert alert-error" role="alert">
+        <span>{{ texto }}</span>
+        @if (existenteInhabilitado() !== null) {
+          <button type="button" class="btn-sec btn-sm" [disabled]="enviando()" (click)="reactivar()">
+            Reactivar alumno
+          </button>
+        }
+      </div>
+    }
+
+    <div class="campo">
+      <label class="field-label" for="alumno-ci">CI</label>
+      <input
+        id="alumno-ci"
+        class="field"
+        type="number"
+        formControlName="ci"
+        [attr.autofocus]="alumno() ? null : ''"
+        (blur)="verificarCi()"
+        [attr.aria-invalid]="mensaje('ci') ? 'true' : null"
+      />
+      @if (verificandoCi()) {
+        <p class="ayuda" role="status">Comprobando CI…</p>
+      }
+      @if (alumno()) {
+        <p class="ayuda">El CI no se puede cambiar.</p>
+      }
+      @if (mensaje('ci'); as m) {
+        <p class="field-error">{{ m }}</p>
+        @if (existenteInhabilitado() !== null) {
+          <button type="button" class="btn-sec btn-sm reactivar" [disabled]="enviando()" (click)="reactivar()">
+            Reactivar alumno
+          </button>
+        }
+      }
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label class="field-label" for="alumno-nombres">Nombres</label>
+        <input
+          id="alumno-nombres"
+          class="field"
+          type="text"
+          formControlName="nombres"
+          [attr.autofocus]="alumno() ? '' : null"
+          autocomplete="off"
+          [attr.aria-invalid]="mensaje('nombres') ? 'true' : null"
+        />
+        @if (mensaje('nombres'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+      <div class="campo">
+        <label class="field-label" for="alumno-apellidos">Apellidos</label>
+        <input
+          id="alumno-apellidos"
+          class="field"
+          type="text"
+          formControlName="apellidos"
+          autocomplete="off"
+          [attr.aria-invalid]="mensaje('apellidos') ? 'true' : null"
+        />
+        @if (mensaje('apellidos'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="campo">
+      <label class="field-label" for="alumno-grupo">Grupo</label>
+      <select
+        id="alumno-grupo"
+        class="field"
+        formControlName="grupoId"
+        [attr.aria-invalid]="mensaje('grupoId') ? 'true' : null"
+      >
+        <option [ngValue]="null">
+          {{ grupos.isLoading() ? 'Cargando grupos…' : 'Selecciona un grupo' }}
+        </option>
+        @for (o of opcionesGrupo(); track o.id) {
+          <option [ngValue]="o.id">{{ o.etiqueta }}</option>
+        }
+      </select>
+      @if (grupos.error()) {
+        <p class="field-error">No se pudieron cargar los grupos.</p>
+      }
+      @if (mensaje('grupoId'); as m) {
+        <p class="field-error">{{ m }}</p>
+      }
+    </div>
+
+    <div class="fila">
+      <div class="campo">
+        <label class="field-label" for="alumno-edad">Edad</label>
+        <input
+          id="alumno-edad"
+          class="field"
+          type="number"
+          formControlName="edad"
+          [attr.aria-invalid]="mensaje('edad') ? 'true' : null"
+        />
+        @if (mensaje('edad'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+      <div class="campo">
+        <label class="field-label" for="alumno-telefono">Teléfono</label>
+        <input
+          id="alumno-telefono"
+          class="field"
+          type="tel"
+          formControlName="telefono"
+          [attr.aria-invalid]="mensaje('telefono') ? 'true' : null"
+        />
+        @if (mensaje('telefono'); as m) {
+          <p class="field-error">{{ m }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="campo">
+      <label class="field-label" for="alumno-correo">Correo</label>
+      <input
+        id="alumno-correo"
+        class="field"
+        type="email"
+        formControlName="correo"
+        autocomplete="off"
+        [attr.aria-invalid]="mensaje('correo') ? 'true' : null"
+      />
+      @if (mensaje('correo'); as m) {
+        <p class="field-error">{{ m }}</p>
+      }
+    </div>
+
+    <div class="form-acciones">
+      <button type="button" class="btn-sec" (click)="cancelar.emit()">Cancelar</button>
+      <button type="submit" class="btn" [disabled]="enviando()">
+        {{ enviando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-dialog>

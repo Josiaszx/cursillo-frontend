@@ -1,0 +1,46 @@
+.gc {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+
+  &.off {
+    background: var(--color-superficie-alt);
+  }
+}
+
+.gtop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gname {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.gfoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-borde-suave);
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.pie-lista {
+  margin-top: 16px;
+
+  app-paginador {
+    display: block;
+  }
+}

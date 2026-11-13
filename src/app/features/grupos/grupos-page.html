@@ -1,0 +1,110 @@
+<header class="page-head">
+  <div>
+    <h1 class="page-title">Grupos</h1>
+    <p class="page-sub">
+      @if (grupos.hasValue()) {
+        {{ grupos.value().length }} {{ grupos.value().length === 1 ? 'grupo' : 'grupos' }}
+      } @else {
+        Convocatorias y sus alumnos
+      }
+    </p>
+  </div>
+  <button class="btn" type="button" (click)="nuevo()">
+    <app-icon nombre="mas" [tamano]="18" />
+    Nuevo grupo
+  </button>
+</header>
+
+@if (error(); as texto) {
+  <div class="alert alert-error" role="alert">
+    <span>{{ texto }}</span>
+    <button type="button" class="alert-cerrar" (click)="error.set(null)">Cerrar</button>
+  </div>
+}
+
+<div class="toolbar">
+  <app-selector-estado [(valor)]="estado" />
+</div>
+
+@if (grupos.error()) {
+  <div class="alert alert-error" role="alert">
+    <span>{{ mensajeCarga() }}</span>
+    <button type="button" class="btn-sec btn-sm" (click)="grupos.reload()">Reintentar</button>
+  </div>
+} @else if (grupos.isLoading() && !grupos.hasValue()) {
+  <p class="estado-vacio" role="status">Cargando grupos…</p>
+} @else if (grupos.hasValue()) {
+  @if (grupos.value().length === 0) {
+    <p class="estado-vacio card">No hay grupos para este filtro.</p>
+  } @else {
+    <section class="grid-cards" aria-label="Lista de grupos">
+      @for (g of paginacion.visibles(); track g.id) {
+        <article class="card gc" [class.off]="!g.habilitado">
+          <div class="gtop">
+            <h2 class="gname">{{ g.nombre }}</h2>
+            @if (!g.habilitado) {
+              <span class="badge badge-off">Inhabilitado</span>
+            }
+          </div>
+          <dl class="dl">
+            <div class="dr"><dt>Convocatoria</dt><dd>{{ convocatoria(g) }}</dd></div>
+            <div class="dr"><dt>Alumnos</dt><dd>{{ g.cantidadAlumnos }}</dd></div>
+          </dl>
+          <div class="gfoot">
+            <a class="lnk" [routerLink]="['/grupos', g.id]">Ver detalle</a>
+            <div class="acciones">
+              <button type="button" class="btn-sec btn-sm" (click)="editar(g)">Editar</button>
+              @if (g.habilitado) {
+                <button
+                  type="button"
+                  class="btn-sec btn-sm"
+                  [disabled]="procesando() === g.id"
+                  (click)="inhabilitar(g)"
+                >
+                  Inhabilitar
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn-sec btn-sm"
+                  [disabled]="procesando() === g.id"
+                  (click)="habilitar(g)"
+                >
+                  Habilitar
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+    <div class="card pie-lista">
+      <app-paginador
+        [page]="paginacion.paginaActual()"
+        [size]="paginacion.size()"
+        [total]="paginacion.total()"
+        [borde]="false"
+        (pageChange)="paginacion.irA($event)"
+        (sizeChange)="paginacion.cambiarTamano($event)"
+      />
+    </div>
+  }
+}
+
+@if (formAbierto()) {
+  <app-grupo-form [grupo]="grupoEditando()" (guardado)="alGuardar($event)" (cancelar)="formAbierto.set(false)" />
+}
+
+@if (cascada(); as c) {
+  <app-dialog titulo="Inhabilitar grupo" (cerrar)="cascada.set(null)">
+    <p>
+      Inhabilitar el grupo <strong>{{ c.grupo.nombre }}</strong> también inhabilitará a sus
+      alumnos y clases. Se inhabilitarán <strong>{{ c.alumnos }} alumnos</strong> y
+      <strong>{{ c.clases }} clases</strong>. ¿Continuar?
+    </p>
+    <div class="form-acciones">
+      <button type="button" class="btn-sec" (click)="cascada.set(null)">Cancelar</button>
+      <button type="button" class="btn" (click)="confirmarCascada()">Sí, inhabilitar</button>
+    </div>
+  </app-dialog>
+}
